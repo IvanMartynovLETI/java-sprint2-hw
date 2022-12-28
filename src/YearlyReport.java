@@ -35,25 +35,25 @@ public class YearlyReport {
 
     public int getIncomePerMonthFromYearReport(int monthNumber, ArrayList<YearDataString> yearDataList) {
         int incomePerMonth = 0;
+        int startAnalyzePositionOfYearReport = 2 * (monthNumber - 1);
+        int endAnalyzePositionOfYearReport = 2 * (monthNumber - 1) + 1;
 
-        for (YearDataString yearDataString : yearDataList) {
-            if (yearDataString.monthNumber == monthNumber) {
-                if (!yearDataString.isExpense)
-                    incomePerMonth = yearDataString.amount;
-            }
-        }
+        for (int index = startAnalyzePositionOfYearReport; index <= endAnalyzePositionOfYearReport; index++)
+            if (!yearDataList.get(index).isExpense)
+                incomePerMonth = yearDataList.get(index).amount;
+
         return incomePerMonth;
     }
 
     public int getExpensePerMonthFromYearReport(int monthNumber, ArrayList<YearDataString> yearDataList) {
         int expensePerMonth = 0;
+        int startAnalyzePositionOfYearReport = 2 * (monthNumber - 1);
+        int endAnalyzePositionOfYearReport = 2 * (monthNumber - 1) + 1;
 
-        for (YearDataString yearDataString : yearDataList) {
-            if (yearDataString.monthNumber == monthNumber) {
-                if (yearDataString.isExpense)
-                    expensePerMonth = yearDataString.amount;
-            }
-        }
+        for (int index = startAnalyzePositionOfYearReport; index <= endAnalyzePositionOfYearReport; index++)
+            if (yearDataList.get(index).isExpense)
+                expensePerMonth = yearDataList.get(index).amount;
+
         return expensePerMonth;
     }
 

@@ -37,49 +37,51 @@ public class ReportManager {
         new YearlyReport().printYearReportInfo(path, dataOfYearReport.get(yearlyReport.getYear(path)));
     }
 
-    boolean reportCheck(HashMap<Integer, ArrayList<MonthDataString>> dataOfAllMonthsReports, HashMap<Integer, ArrayList<YearDataString>> dataOfYearReport) {
-        int year = 2021;
+    public boolean checkIncomeInMonthAndYearReports(int monthNumber, int year, HashMap<Integer, ArrayList<MonthDataString>> dataOfAllMonthsReports, HashMap<Integer, ArrayList<YearDataString>> dataOfYearReport) {
         boolean isCheckedOk = true;
-        int totalIncomePerMonthFromYearReport = 0;
+        int totalIncomePerMonthFromYearReport;
         int totalIncomeFromMonthReport;
-        int totalExpensePerMonthFromYearReport = 0;
-        int totalExpenseFromMonthReport;
-        ArrayList<YearDataString> yearReportToBeAnalyzed = dataOfYearReport.get(year);
-        int monthCount = yearReportToBeAnalyzed.size() / 2;
-        int startAnalyzePositionOfYearReport;
-        int endAnalyzePositionOfYearReport;
         MonthlyReport monthlyReport = new MonthlyReport();
+        totalIncomePerMonthFromYearReport = new YearlyReport().getIncomePerMonthFromYearReport(monthNumber, dataOfYearReport.get(year));
+        totalIncomeFromMonthReport = monthlyReport.getTotalIncomePerMonth(dataOfAllMonthsReports.get(monthNumber));
 
-        for (int monthNumber = 1; monthNumber <= monthCount; monthNumber++) {
-            startAnalyzePositionOfYearReport = 2 * (monthNumber - 1);
-            endAnalyzePositionOfYearReport = 2 * (monthNumber - 1) + 1;
-
-            for (int index = startAnalyzePositionOfYearReport; index <= endAnalyzePositionOfYearReport; index++) {
-                if (!yearReportToBeAnalyzed.get(index).isExpense)
-                    totalIncomePerMonthFromYearReport = yearReportToBeAnalyzed.get(index).amount;
-                else
-                    totalExpensePerMonthFromYearReport = yearReportToBeAnalyzed.get(index).amount;
-
-            }
-
-            totalIncomeFromMonthReport = monthlyReport.getTotalIncomePerMonth(dataOfAllMonthsReports.get(monthNumber));
-            totalExpenseFromMonthReport = monthlyReport.getTotalExpensePerMonth(dataOfAllMonthsReports.get(monthNumber));
-
-            if (totalIncomePerMonthFromYearReport != totalIncomeFromMonthReport) {
-                System.out.println("\nОбнаружена ошибка за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " месяц.");
-                System.out.println("Доходы за " + monthlyReport.months[monthNumber - 1].toLowerCase()  + " в годовом и месячном отчетах не соответствуют друг другу.");
-                isCheckedOk = false;
-            }
-
-            if (totalExpensePerMonthFromYearReport != totalExpenseFromMonthReport) {
-                System.out.println("\nОбнаружена ошибка за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " месяц.");
-                System.out.println("Расходы за " + monthlyReport.months[monthNumber - 1].toLowerCase()  + " в годовом и месячном отчетах не соответствуют друг другу.");
-                isCheckedOk = false;
-            }
+        if (totalIncomePerMonthFromYearReport != totalIncomeFromMonthReport) {
+            System.out.println("\nОбнаружена ошибка за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " месяц.");
+            System.out.println("Доходы за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " в годовом и месячном отчетах не соответствуют друг другу.");
+            isCheckedOk = false;
         }
         return isCheckedOk;
     }
+
+    public boolean checkExpenseInMonthAndYearReports(int monthNumber, int year, HashMap<Integer, ArrayList<MonthDataString>> dataOfAllMonthsReports, HashMap<Integer, ArrayList<YearDataString>> dataOfYearReport) {
+        boolean isCheckedOk = true;
+        int totalExpensePerMonthFromYearReport;
+        int totalExpenseFromMonthReport;
+        MonthlyReport monthlyReport = new MonthlyReport();
+        totalExpensePerMonthFromYearReport = new YearlyReport().getExpensePerMonthFromYearReport(monthNumber, dataOfYearReport.get(year));
+        totalExpenseFromMonthReport = monthlyReport.getTotalExpensePerMonth(dataOfAllMonthsReports.get(monthNumber));
+
+        if (totalExpensePerMonthFromYearReport != totalExpenseFromMonthReport) {
+            System.out.println("\nОбнаружена ошибка за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " месяц.");
+            System.out.println("Расходы за " + monthlyReport.months[monthNumber - 1].toLowerCase() + " в годовом и месячном отчетах не соответствуют друг другу.");
+            isCheckedOk = false;
+        }
+        return isCheckedOk;
+    }
+
+    public boolean reportCheck(HashMap<Integer, ArrayList<MonthDataString>> dataOfAllMonthsReports, HashMap<Integer, ArrayList<YearDataString>> dataOfYearReport) {
+        int year = 2021;
+        boolean isCheckedOkTotal = true;
+        boolean isCheckedOkPerMonth;
+        ArrayList<YearDataString> yearReportToBeAnalyzed = dataOfYearReport.get(year);
+        int monthCount = yearReportToBeAnalyzed.size() / 2;
+
+        for (int monthNumber = 1; monthNumber <= monthCount; monthNumber++) {
+            isCheckedOkPerMonth = checkIncomeInMonthAndYearReports(monthNumber, year, dataOfAllMonthsReports, dataOfYearReport) &&
+                    checkExpenseInMonthAndYearReports(monthNumber, year, dataOfAllMonthsReports, dataOfYearReport);
+            isCheckedOkTotal &= isCheckedOkPerMonth;
+        }
+        return isCheckedOkTotal;
+    }
 }
-
-
 
